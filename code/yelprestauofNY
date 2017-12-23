@@ -1,0 +1,79 @@
+# coding: utf-8
+import requests
+from bs4 import BeautifulSoup
+
+def restaurant_claw(i):
+    url = 'https://www.yelp.com/search?find_loc=New+York,+NY&start={}0&cflt=restaurants'.format(i)
+    print('clawing url: ',url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36'}
+    url_html = requests.get(url, headers=headers)
+    soup = BeautifulSoup(url_html.text)
+    
+    for line in soup.select('span > a'): #soup.findAll('span', {'class:', 'indexed-biz-name'}):   #resaurant name 
+        if line.string is not None: 
+            if line.get('data-hovercard-id') is not None: 
+                #print(line.string)
+                rest_name.append(line.string)
+    i = 0 #filter                                    
+    for line in soup.select('div'): #rating, which is in the div type content
+        #print(line)
+        if line.get('class') is not None:
+            #print(line.get('class')[0])
+    
+            if line.get('class')[0] == 'i-stars':
+                i +=1
+                #print(line)
+                star = line.get('title').split()[0]
+                if 2<i and i<13: rest_rating.append(line.get('title').split()[0])
+    i=0 #filter
+    for line in soup.findAll('span',{'class:','review-count rating-qualifier'}):
+        #print(line.string)
+        i +=1
+        if 2<i and i<13: reviews_num.append(line.string.split()[0])
+    i = 0
+    for line in soup.findAll('span',{'class:','neighborhood-str-list'}):
+        #print(line.string)
+        i +=1
+        if 2<i and i<13: neighborhood.append(line.string)
+    i = 0
+    ''' 
+    for line in soup.findAll('div',{'class:','secondary-attributes'}):
+        soup1 = BeautifulSoup(str(line))
+        print(str(soup1.findAll('address')[0]).split('\n')[1].strip())
+        #print(line)
+        i +=1
+        if 2<i and i<13: location.append(str(soup1.findAll('address')[0]).split('\n')[1].strip())
+    i = 0
+    '''
+    for line in soup.findAll('span',{'class','biz-phone'}):
+        #print(line.string)
+        i +=1
+        if 2<i and i<13: number.append(line.string) 
+    i = 0
+    for line in soup.findAll('span',{'class:','category-str-list'}):
+        #print(line)
+        i = i + 1
+        if 2<i and i<13:
+            soup1 = BeautifulSoup(str(line))
+            y=[]
+            for x in soup1.findAll('a'):
+                y.append(x.string)
+            food_type.append(','.join(y))    
+    
+    
+if __name__ == '__main__':    
+    rest_name = ['rest_name']
+    rest_rating = ['rating']
+    reviews_num = ['reviews_num']
+    neighborhood = ['neighborhood']
+    location = ['location']
+    number = ['number']
+    food_type = ['type']
+    for i in range(5): restaurant_claw(i)
+    #restaurant_claw(99)
+    print(rest_name)
+    with open('result.txt', 'w') as f:
+        for i in range(len(rest_name)):
+            f.write(rest_name[i].center(30)+rest_rating[i].center(20)+\
+                                    reviews_num[i].center(20)+food_type[i].center(50)+\
+                                    neighborhood[i].strip().center(40)+number[i].strip().center(20)+'\n' )    
