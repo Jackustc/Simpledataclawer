@@ -73,7 +73,7 @@ if __name__ == '__main__':
     for i in range(100): restaurant_claw(i)
     #restaurant_claw(99)
     print(rest_name)
-    with open('result.txt', 'w') as f:
+    with open('result.txt', 'w','utf-8') as f:
         for i in range(len(rest_name)):
             f.write(rest_name[i].center(30)+rest_rating[i].center(20)+\
                                     reviews_num[i].center(20)+food_type[i].center(50)+\
